@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active English Lab — From Passive to Active English</title>
+<style>
+:root{
+  --navy:#17345f; --blue:#2563a9; --light:#eef5fc; --ink:#172033;
+  --muted:#667085; --line:#dbe4ef; --white:#fff; --green:#23845b;
+  --orange:#d97706; --red:#c24141; --shadow:0 10px 30px rgba(23,52,95,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:#f7f9fc;color:var(--ink);line-height:1.55}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+aside{width:270px;background:var(--navy);color:#fff;padding:24px 16px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{font-size:21px;font-weight:800;margin:0 8px 4px}.tag{font-size:12px;opacity:.75;margin:0 8px 22px}
+.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#e8eef7;text-align:left;padding:11px 12px;border-radius:10px}
+.nav button:hover,.nav button.active{background:rgba(255,255,255,.13)}
+main{flex:1;max-width:1200px;padding:30px;margin:auto}
+.top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:24px}
+h1{font-size:32px;margin:0 0 6px}.subtitle{color:var(--muted);max-width:720px}
+.badge{background:#e8f2ff;color:var(--blue);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-6{grid-column:span 6}.span-4{grid-column:span 4}
+.card h2,.card h3{margin:0 0 10px}.muted{color:var(--muted)}
+.metric{font-size:31px;font-weight:800;color:var(--navy)}
+.progress{height:9px;background:#e7edf5;border-radius:99px;overflow:hidden}.progress>div{height:100%;background:var(--blue);width:0;transition:.3s}
+.btn{border:0;border-radius:10px;padding:10px 14px;background:var(--navy);color:#fff;font-weight:700}.btn.secondary{background:#e8f2ff;color:var(--blue)}.btn.green{background:var(--green)}
+.btn.small{padding:7px 10px;font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.hidden{display:none!important}
+.section{display:none}.section.active{display:block}
+.prompt{font-size:20px;font-weight:700;padding:16px;background:var(--light);border-left:4px solid var(--blue);border-radius:10px}
+textarea,input,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;background:#fff;color:var(--ink)}
+textarea{min-height:180px;resize:vertical}
+.transcript-box{background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.transcript-live{min-height:130px}
+.mic-status{font-size:12px;color:var(--muted);margin-top:7px}
+label{font-size:13px;font-weight:700;display:block;margin:12px 0 6px}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;color:var(--muted)}
+.chip{display:inline-block;padding:5px 9px;border-radius:999px;background:#f0f4f8;font-size:12px;margin:2px}
+.flash{min-height:190px;display:flex;align-items:center;justify-content:center;text-align:center;border:2px dashed #b9cbe0;border-radius:14px;padding:24px}
+.flash .chunk{font-size:29px;font-weight:800;color:var(--navy)}
+.timer{font-size:48px;font-weight:800;text-align:center;color:var(--navy)}
+.wordcount{text-align:right;color:var(--muted);font-size:13px}
+.note{padding:12px 14px;border-radius:10px;background:#fff8e8;border:1px solid #f5d69a;color:#805b14}
+.success{padding:12px 14px;border-radius:10px;background:#edf9f3;border:1px solid #bfe8d1;color:#1f6a49}
+.error{padding:12px 14px;border-radius:10px;background:#fff0f0;border:1px solid #f0c1c1;color:#9b3434}
+.day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.day{border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}.day.done{background:#edf9f3;border-color:#bfe8d1}
+.smalltext{font-size:12px;color:var(--muted)}
+.kicker{text-transform:uppercase;letter-spacing:.08em;color:var(--blue);font-size:12px;font-weight:800}
+@media(max-width:850px){aside{width:210px}.span-8,.span-6,.span-4{grid-column:span 12}.day-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.app{display:block}aside{width:100%;height:auto;position:static}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}main{padding:18px}h1{font-size:26px}.top{display:block}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="logo">Active English Lab</div>
+  <div class="tag">From Passive to Active English</div>
+  <div class="nav">
+    <button class="active" data-section="home">🏠 Dashboard</button>
+    <button data-section="diagnosis">1 · 7-Day Diagnosis</button>
+    <button data-section="chunks">2 · Chunks</button>
+    <button data-section="patterns">3 · Verb Patterns</button>
+    <button data-section="linking">4 · Linking & Hedging</button>
+    <button data-section="complex">5 · Complex Structures</button>
+    <button data-section="speaking">6 · Speaking Lab</button>
+    <button data-section="writing">7 · Writing Lab</button>
+    <button data-section="errorlog">8 · Error Log</button>
+    <button data-section="history">10 · Topic History</button>
+    <button data-section="plan">9 · 4-Week Plan</button>
+  </div>
+</aside>
+
+<main>
+<section id="home" class="section active">
+  <div class="top">
+    <div><div class="kicker">Personalised practice</div><h1>Turn what you know into what you can use.</h1>
+    <div class="subtitle">Designed for an English teacher who already understands a lot of English, but still experiences hesitation, simpler word choices, restarting sentences, and uncertainty when speaking or writing.</div></div>
+    <div class="badge">B2 → C1 • Productive English</div>
+  </div>
+  <div class="grid">
+    <div class="card span-8">
+      <h2>Your core problem</h2>
+      <p>This lab treats your difficulty as an <b>active-retrieval / productive gap</b>, not simply “I don't know enough vocabulary”. The goal is to repeatedly retrieve chunks, patterns and structures under realistic speaking/writing conditions.</p>
+      <div class="note"><b>Rule:</b> Fluency first, accuracy second. Finish the sentence before correcting it.</div>
+    </div>
+    <div class="card span-4"><h3>Overall progress</h3><div class="metric" id="overall">0%</div><div class="progress"><div id="overallBar"></div></div><p class="smalltext">Based on completed practice items stored in this browser.</p></div>
+    <div class="card span-4"><h3>Today's minimum</h3><p>5 chunks · 10 min shadowing · 5 min speaking · 5 min review</p><button class="btn" onclick="show('chunks')">Start chunks</button></div>
+    <div class="card span-4"><h3>Speaking target</h3><p>Reduce pauses >3 seconds, restarts, and replacing known words with simpler ones.</p><button class="btn secondary" onclick="show('speaking')">Open speaking lab</button></div>
+    <div class="card span-4"><h3>Writing target</h3><p>Use stronger chunks, varied linking, hedging, and controlled complex structures.</p><button class="btn secondary" onclick="show('writing')">Open writing lab</button></div>
+    <div class="card span-12"><h2>How this website is built</h2>
+      <div class="grid">
+        <div class="card span-4"><b>Diagnose</b><p class="muted">Record/write without a dictionary. Observe hesitation and recurring errors.</p></div>
+        <div class="card span-4"><b>Retrieve</b><p class="muted">Learn vocabulary as chunks and verb patterns, then actively recall them.</p></div>
+        <div class="card span-4"><b>Use</b><p class="muted">Force the language into speaking and writing, then log only the most important errors.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="diagnosis" class="section">
+<div class="top"><div><div class="kicker">Week 1</div><h1>7-Day Diagnosis</h1><div class="subtitle">Don't try to sound advanced. Collect evidence about what actually blocks you.</div></div></div>
+<div class="card">
+  <div class="day-grid" id="days"></div>
+  <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+  <label>Today's speaking prompt</label>
+<div class="actions" style="margin-bottom:10px">
+<button class="btn secondary" onclick="newDiagTopic()">🔄 New topic</button>
+<button class="btn secondary" onclick="usePreviousDiagTopic()">↶ Previous</button>
+<span class="badge" id="diagTopicInfo">Topic 1</span>
+</div>
+<div class="prompt" id="diagPrompt"></div>
+  <div class="card" style="margin-top:14px;background:#f8fbff">
+    <h3>🎙️ Speaking Recorder</h3>
+    <p class="muted">Record yourself for 3–5 minutes. Don't restart or edit while speaking. Listen back afterward and note your pauses, simpler replacements, and restarts.</p>
+    <div class="actions">
+      <button class="btn green" id="recordBtn" onclick="toggleRecording()">● Start Recording</button>
+      <button class="btn secondary" id="stopRecordBtn" onclick="stopRecording()" disabled>■ Stop</button>
+      <button class="btn secondary" onclick="deleteRecording()">Delete Recording</button>
+    </div>
+    <div id="recordStatus" class="smalltext" style="margin-top:8px">Ready to record.</div>
+    <audio id="recordingAudio" controls class="hidden" style="width:100%;margin-top:12px"></audio>
+    <div class="transcript-box">
+      <b>📝 Live Transcript</b>
+      <div class="mic-status" id="diagTranscriptStatus">Speech-to-text is ready when you start recording.</div>
+      <textarea id="diagTranscript" class="transcript-live" placeholder="Your spoken English will appear here while you speak..."></textarea>
+      <div class="actions" style="margin-top:8px">
+        <button class="btn secondary" onclick="copyTranscriptToDiagnosis()">↳ Copy transcript to sentence</button>
+        <button class="btn secondary" onclick="clearDiagnosisTranscript()">Clear transcript</button>
+      </div>
+    </div>
+  </div>
+  <div class="actions" style="margin-top:12px">
+    <button class="btn" onclick="toggleDay()" id="dayToggleBtn">✓ Mark today's speaking task complete</button>
+    <button class="btn secondary" onclick="nextDiag()">Next day</button>
+  </div>
+  <label>Quick observation after recording</label>
+  <div class="grid">
+    <div class="span-4"><select id="diagPause"><option value="">Pauses?</option><option>Rare</option><option>Several</option><option>Frequent</option></select></div>
+    <div class="span-4"><select id="diagSimple"><option value="">Simpler replacement?</option><option>No</option><option>Sometimes</option><option>Often</option></select></div>
+    <div class="span-4"><select id="diagRestart"><option value="">Restarted?</option><option>No</option><option>Sometimes</option><option>Often</option></select></div>
+  </div>
+  <label>One sentence you struggled to say</label><input id="diagSentence" placeholder="Write the sentence from your recording...">
+  <button class="btn secondary" style="margin-top:10px" onclick="saveDiagnosis()">Save observation to Error Log</button>
+  <div id="diagMsg"></div>
+</div>
+<div class="card" style="margin-top:16px"><h2>Writing diagnosis</h2><p>Do these without a dictionary or translator. Aim for 150–200 words and 20 minutes.</p>
+<table><tr><th>#</th><th>Type</th><th>Prompt</th><th>Status</th></tr>
+<tr><td>1</td><td>Opinion</td><td>Is homework still useful?</td><td><input type="checkbox" onchange="saveCheck('w1',this.checked)"></td></tr>
+<tr><td>2</td><td>Description</td><td>A typical day in your classroom.</td><td><input type="checkbox" onchange="saveCheck('w2',this.checked)"></td></tr>
+<tr><td>3</td><td>Semi-formal email</td><td>Write to a parent about a student who is falling behind.</td><td><input type="checkbox" onchange="saveCheck('w3',this.checked)"></td></tr>
+</table></div>
+</section>
+
+<section id="chunks" class="section">
+<div class="top"><div><div class="kicker">Active retrieval</div><h1>Chunk Trainer</h1><div class="subtitle">Don't memorize isolated words. Retrieve a phrase, then make it yours.</div></div></div>
+<div class="card">
+  <div class="actions"><select id="chunkCategory" onchange="renderChunk()"><option>Teaching & Classroom</option><option>Opinion & Academic</option></select>
+<button class="btn secondary" onclick="shuffleChunk()">🔄 New chunk</button>
+<button class="btn secondary" onclick="usePreviousChunk()">↶ Previous</button>
+<span class="badge" id="chunkTopicInfo">Chunk 1</span></div>
+  <div class="flash" style="margin-top:14px"><div><div class="chunk" id="chunkText"></div><p id="chunkExample" class="muted"></p></div></div>
+  <label>Your own sentence — make it about your actual life/classroom</label>
+  <textarea id="chunkOwn" placeholder="Example: I use short retrieval activities to keep my students engaged..."></textarea>
+  <div class="actions"><button class="btn" onclick="checkChunk()">Use this chunk</button><button class="btn secondary" onclick="revealChunk()">Show example</button></div>
+  <div id="chunkMsg"></div>
+</div>
+<div class="card" style="margin-top:16px"><h2>5-chunk routine</h2><ol><li>Look at the chunk.</li><li>Recall the meaning without translating word-by-word.</li><li>Say or write one personal sentence.</li><li>Use at least one chunk in today's speaking/writing.</li><li>Review it from your error log later.</li></ol></div>
+</section>
+
+<section id="patterns" class="section">
+<div class="top"><div><div class="kicker">Precision</div><h1>Verb Pattern Trainer</h1><div class="subtitle">These are the kinds of forms that can feel “obvious” while reading but become uncertain during production.</div></div></div>
+<div class="card">
+<table><tr><th>Pattern</th><th>Correct</th><th>Common trap</th></tr>
+<tbody id="patternTable"></tbody></table>
+</div>
+<div class="card" style="margin-top:16px">
+<h2>Quick production quiz</h2><div id="patternQuiz"></div><button class="btn" onclick="newPatternQuestion()">New question</button>
+</div>
+</section>
+
+<section id="linking" class="section">
+<div class="top"><div><div class="kicker">Cohesion + academic tone</div><h1>Linking & Hedging</h1><div class="subtitle">Move beyond repeating “I think”, “but”, “so”, and overly absolute claims.</div></div></div>
+<div class="grid">
+<div class="card span-6"><h2>Linking by function</h2><table><tr><th>Function</th><th>Useful choices</th></tr>
+<tr><td>Contrast</td><td>however · nevertheless · that said · whereas · in contrast</td></tr>
+<tr><td>Concession</td><td>although · even though · despite · admittedly</td></tr>
+<tr><td>Result</td><td>as a result · consequently · therefore · hence</td></tr>
+<tr><td>Addition</td><td>moreover · furthermore · in addition · what is more</td></tr>
+<tr><td>Clarification</td><td>in other words · that is to say · to put it differently</td></tr>
+<tr><td>Opinion</td><td>in my view · from my perspective · as far as I am concerned</td></tr>
+</table></div>
+<div class="card span-6"><h2>Hedging</h2><p>Use these when a claim should be more cautious:</p><div id="hedges"></div>
+<div class="prompt" style="font-size:16px;margin-top:14px">Students who use phones get worse grades.</div>
+<label>Rewrite the claim more cautiously</label><textarea id="hedgeInput" style="min-height:120px"></textarea>
+<button class="btn" onclick="checkHedge()">Compare</button><div id="hedgeMsg"></div></div>
+</div>
+</section>
+
+<section id="complex" class="section">
+<div class="top"><div><div class="kicker">B2 → C1</div><h1>Complex Structure Lab</h1><div class="subtitle">These structures are for controlled range—not for forcing “fancy English” into every sentence.</div></div></div>
+<div class="card"><table><tr><th>Structure</th><th>Model</th></tr>
+<tr><td>Inversion</td><td>Rarely do students ask questions.</td></tr>
+<tr><td>Not only...</td><td>Not only did he forget his book, but he also lost his homework.</td></tr>
+<tr><td>No sooner...</td><td>No sooner had the bell rung than the students left.</td></tr>
+<tr><td>Only after...</td><td>Only after the results came out did we understand the problem.</td></tr>
+<tr><td>Cleft</td><td>It was the lack of practice that caused the problem.</td></tr>
+<tr><td>What-clause</td><td>What students need is more speaking time.</td></tr>
+<tr><td>Mixed conditional</td><td>If I had studied abroad, I would be more fluent now.</td></tr>
+<tr><td>Passive reporting</td><td>It is widely believed that practice makes fluency.</td></tr>
+</table></div>
+<div class="card" style="margin-top:16px"><h2>Transformation practice</h2><p id="complexQ"></p><input id="complexA" placeholder="Rewrite using the requested structure..."><div class="actions" style="margin-top:10px"><button class="btn" onclick="checkComplex()">Check</button><button class="btn secondary" onclick="newComplex()">New</button></div><div id="complexMsg"></div></div>
+</section>
+
+<section id="speaking" class="section">
+<div class="top"><div><div class="kicker">Output</div><h1>Speaking Lab</h1><div class="subtitle">Separate fluency from accuracy. Don't restart a sentence just because it isn't perfect.</div></div></div>
+<div class="grid">
+<div class="card span-8"><h2>4–3–2 Fluency Drill</h2>
+<div class="actions" style="margin-bottom:10px">
+<button class="btn secondary" onclick="newSpeakingTopic()">🔄 New topic</button>
+<button class="btn secondary" onclick="usePreviousSpeakingTopic()">↶ Previous</button>
+<span class="badge" id="speakTopicInfo">Topic 1</span>
+</div>
+<div class="prompt" id="speakPrompt"></div><div class="timer" id="timer">04:00</div>
+<div class="actions" style="justify-content:center">
+  <button class="btn" onclick="startTimer(240)">Start 4 min</button>
+  <button class="btn secondary" onclick="startTimer(180)">Start 3 min</button>
+  <button class="btn secondary" onclick="startTimer(120)">Start 2 min</button>
+  <button class="btn secondary" onclick="continueTimer()" id="continueTimerBtn">▶ Continue</button>
+  <button class="btn secondary" onclick="pauseTimer()">⏸ Pause</button>
+  <button class="btn" onclick="resetTimer()">↺ Reset</button>
+</div>
+<p class="muted">Same topic every round. Keep the ideas and useful vocabulary; improve speed and smoothness.</p></div>
+<div class="card span-4"><h2>Rescue phrases</h2>
+<p><b>Thinking:</b> “That's a good question. Let me think for a second.”</p>
+<p><b>Forgot a word:</b> “What's the word...?” / “It's a kind of...”</p>
+<p><b>Repair:</b> “Sorry, what I meant was...” / “Let me rephrase that.”</p>
+<p><b>Clarify:</b> “In other words...”</p>
+<p><b>Opinion:</b> “From my perspective...”</p>
+</div></div>
+<div class="card" style="margin-top:16px">
+  <h2>🎙️ Speaking Recorder + Auto Transcript</h2>
+  <p>Record your answer here. Your speech is transcribed live into the box below so you can select a sentence and correct it.</p>
+  <div class="actions">
+    <button class="btn green" onclick="startSpeakingRecorder()" id="speakRecordBtn">● Start Recording</button>
+    <button class="btn secondary" onclick="stopSpeakingRecorder()" id="speakStopBtn" disabled>■ Stop</button>
+    <button class="btn secondary" onclick="clearSpeakingTranscript()">Clear</button>
+  </div>
+  <div id="speakRecordStatus" class="mic-status">Ready.</div>
+  <audio id="speakRecordingAudio" controls class="hidden" style="width:100%;margin-top:12px"></audio>
+
+  <div class="transcript-box">
+    <b>📝 Your transcript</b>
+    <div class="mic-status">Chrome will turn your speech into text while you speak. You can edit the transcript manually.</div>
+    <textarea id="speakTranscript" class="transcript-live" placeholder="Start recording and speak. Your transcript will appear here..."></textarea>
+  </div>
+
+  <div class="transcript-box">
+    <b>🔎 Sentence for correction</b>
+    <p class="smalltext">Highlight one sentence in the transcript, then copy it here and correct it.</p>
+    <textarea id="speakSentence" style="min-height:100px" placeholder="Select/copy a sentence from the transcript, or type the sentence you want to correct..."></textarea>
+    <div class="actions">
+      <button class="btn secondary" onclick="copySelectedTranscriptSentence()">↳ Copy selected text</button>
+      <button class="btn secondary" onclick="copyTranscriptToSentence()">↳ Copy whole transcript</button>
+    </div>
+    <label>Correct version</label>
+    <textarea id="speakCorrection" style="min-height:100px" placeholder="Write the version you think is correct..."></textarea>
+    <div class="grid">
+      <div class="span-6"><label>Category</label>
+        <select id="speakErrorCategory">
+          <option>COL — Collocation</option><option>VP — Verb pattern</option><option>LINK — Linking</option>
+          <option>REG — Register</option><option>TENSE — Complex tense</option><option>STR — Sentence structure</option><option>FLU — Fluency</option>
+        </select>
+      </div>
+      <div class="span-6"><label>My new sentence</label><input id="speakNewSentence" placeholder="Use the corrected pattern in a new sentence..."></div>
+    </div>
+    <button class="btn" style="margin-top:10px" onclick="saveSpeakingCorrection()">Add this error to Error Log</button>
+    <div id="speakCorrectionMsg"></div>
+  </div>
+
+  <div class="transcript-box">
+    <h3>Accuracy pass</h3>
+    <p>After speaking, record only <b>3 biggest errors</b>. Do not correct everything.</p>
+    <textarea id="accuracyNotes" placeholder="1. ...&#10;2. ...&#10;3. ..."></textarea>
+    <button class="btn secondary" onclick="saveAccuracy()">Add notes to error log</button>
+    <div id="accuracyMsg"></div>
+  </div>
+</div>
+</section>
+
+<section id="writing" class="section">
+<div class="top"><div><div class="kicker">Output</div><h1>Writing Lab</h1><div class="subtitle">Notice → rewrite → revise. The goal is not to use “big words”; it is to choose language you can control.</div></div></div>
+<div class="card"><div class="actions">
+<select id="writePrompt" onchange="loadWritingPrompt()"></select>
+<button class="btn secondary" onclick="newWritingTopic()">🔄 New topic</button>
+<button class="btn secondary" onclick="usePreviousWritingTopic()">↶ Previous</button>
+<span class="badge" id="writeTarget">150–200 words</span></div>
+<div class="prompt" style="margin-top:14px" id="writeQuestion"></div>
+<textarea id="writingArea" style="margin-top:14px;min-height:300px" placeholder="Write without translating every sentence..."></textarea>
+<div class="wordcount" id="wordcount">0 words</div>
+<div class="actions"><button class="btn secondary" onclick="saveDraft()">Save draft</button><button class="btn" onclick="runRevisionChecklist()">Run revision checklist</button></div>
+<div id="revision"></div></div>
+<div class="card" style="margin-top:16px"><h2>Revision checklist</h2><ol><li>One main idea per paragraph?</li><li>Replace repeated “and / but / so” with appropriate linking.</li><li>Replace 5 generic words (good, bad, very, thing, make) where possible.</li><li>Soften absolute claims when appropriate.</li><li>Add only the most important errors to your Error Log.</li></ol></div>
+<div class="card" style="margin-top:16px">
+  <div class="kicker">Personal feedback</div>
+  <h2 style="margin:0 0 8px">🔎 Writing Error Analysis</h2>
+  <p class="muted">A guided checker that finds recognizable grammar, word-choice, cohesion, and naturalness patterns, explains them, and gives a better alternative.</p>
+  <button class="btn" onclick="analyzeWriting()">Analyze my writing</button>
+  <div id="writingAnalysis" style="margin-top:14px"></div>
+</section>
+
+<section id="history" class="section">
+<div class="top"><div><div class="kicker">Long-term practice</div><h1>Topic History</h1><div class="subtitle">Topics you have used are remembered in this browser. Old topics stay available, while new ones keep rotating.</div></div></div>
+<div class="card">
+<p class="muted"><b>New topic</b> gives you another item from the bank. <b>Previous</b> brings back the previous topic you used. This lets the lab grow into a long-term practice system instead of a one-time 4-week course.</p>
+<div class="actions">
+<button class="btn secondary" onclick="showUnusedTopics()">✨ Show unused</button>
+<button class="btn secondary" onclick="renderTopicHistory()">Show history</button>
+<button class="btn secondary" onclick="clearTopicHistory()">Clear topic history</button>
+</div>
+<div id="topicHistoryRows"></div>
+</div>
+</section>
+
+<section id="errorlog" class="section">
+<div class="top"><div><div class="kicker">Your personal curriculum</div><h1>Error Log</h1><div class="subtitle">Your recurring errors decide what you study next. One problem = one row.</div></div></div>
+<div class="card">
+<div class="grid">
+<div class="span-4"><label>What I said/wrote</label><input id="eWrong"></div>
+<div class="span-4"><label>Better version</label><input id="eRight"></div>
+<div class="span-4"><label>Category</label><select id="eCat"><option>COL — Collocation</option><option>VP — Verb pattern</option><option>LINK — Linking</option><option>REG — Register</option><option>TENSE — Complex tense</option><option>STR — Sentence structure</option><option>FLU — Fluency</option></select></div>
+</div>
+<label>My new sentence</label><input id="eNew">
+<button class="btn" style="margin-top:10px" onclick="addError()">Add error</button>
+</div>
+<div class="card" style="margin-top:16px"><div class="actions" style="justify-content:space-between"><h2 style="margin:0">Your patterns</h2><button class="btn secondary" onclick="clearErrors()">Clear all</button></div>
+<table><thead><tr><th>Problem</th><th>Better</th><th>Category</th><th>New sentence</th></tr></thead><tbody id="errorRows"></tbody></table>
+</div>
+</section>
+
+<section id="plan" class="section">
+<div class="top"><div><div class="kicker">4 weeks</div><h1>Your training plan</h1><div class="subtitle">30–40 minutes a day. If that is too heavy, do four days first.</div></div></div>
+<div class="grid">
+<div class="card span-3"><h3>Week 1</h3><p>Diagnosis + error log</p><small>7 speaking recordings · 3 writings</small></div>
+<div class="card span-3"><h3>Week 2</h3><p>Chunks + patterns</p><small>5 chunks/day · shadowing · short output</small></div>
+<div class="card span-3"><h3>Week 3</h3><p>Structure</p><small>Linking · hedging · complex structures · 4–3–2</small></div>
+<div class="card span-3"><h3>Week 4</h3><p>Measure again</p><small>Repeat Week 1 prompts and compare</small></div>
+</div>
+<div class="card" style="margin-top:16px"><h2>Daily routine</h2><table><tr><th>Activity</th><th>Time</th></tr><tr><td>Flashcards / chunk recall</td><td>5 min</td></tr><tr><td>Shadowing</td><td>10 min</td></tr><tr><td>Speaking</td><td>5+ min</td></tr><tr><td>Writing</td><td>10–20 min</td></tr><tr><td>Revision + error log</td><td>5 min</td></tr></table>
+<p class="note"><b>Long-term mode:</b> The current topic bank is only the starting bank. Keep using New topic for fresh prompts, Previous for review, and Topic History to revisit old material. New topic packs can be added later without changing the learning system.</p><p class="success"><b>Progress indicators:</b> fewer pauses over 3 seconds, fewer restarts, fewer “simpler replacements”, fewer recurring errors, and target chunks appearing spontaneously in your speech.</p></div>
+</section>
+</main>
+</div>
+
+<script>
+const promptBank=[
+"Describe a lesson that went badly and what you would change.",
+"Explain how you teach the difference between simple past and present perfect.",
+"Should students be allowed to use phones in class? Give your opinion and reasons.",
+"Describe a student who surprised you.",
+"What makes a good English teacher?",
+"Compare how you were taught English with how you teach it now.",
+"Talk about a mistake you often make in English and why you think it happens.",
+"How do you motivate students who are afraid of making mistakes?",
+"Should English classes focus more on communication or accuracy?",
+"Describe a teaching decision you made that you later changed.",
+"What makes feedback useful to a learner?",
+"How can teachers balance students' different ability levels?",
+"Should students receive homework every day?",
+"Describe a classroom activity that consistently works well for you.",
+"What is one English skill that students often underestimate?",
+"How has technology changed the way students learn English?",
+"Should schools teach AI literacy to students?",
+"What makes a lesson memorable?",
+"How would you explain a difficult grammar point without using technical terms?",
+"Describe a time when you misunderstood someone in English.",
+"How do you decide whether a word is worth teaching to your students?",
+"What is the biggest difference between knowing a word and being able to use it?",
+"Should exams measure knowledge or problem-solving ability?",
+"How can teachers encourage students to speak without overcorrecting them?",
+"Describe your ideal English classroom.",
+"What makes a good English textbook?",
+"How should teachers respond when students repeatedly make the same error?",
+"Is memorisation still important in language learning?",
+"How can students become more independent learners?",
+"Should students be allowed to use translation tools?",
+"Describe a professional skill you want to improve this year.",
+"How do you know whether your students actually understand a concept?",
+"What makes an explanation clear?",
+"Should teachers adapt lessons to students' interests?",
+"How can a teacher build students' confidence without lowering standards?"
+];
+const prompts=promptBank;
+const chunks={
+"Teaching & Classroom":[
+["keep students engaged","Short games keep students engaged after lunch."],
+["foster critical thinking","Open-ended questions foster critical thinking."],
+["address a misconception","I addressed the misconception before moving on."],
+["set clear expectations","I set clear expectations in the first week."],
+["provide feedback on","She provided detailed feedback on their essays."],
+["assess progress","Weekly quizzes help me assess students' progress."],
+["reinforce a concept","Repetition reinforces the concept."],
+["scaffold a task","I scaffold the task with sentence starters."],
+["differentiate instruction","It is hard to differentiate instruction in a class of 40."],
+["fall behind / catch up","Students who fall behind need time to catch up."],
+["elicit a response","The picture was meant to elicit a response."],
+["lose interest in","Many students lose interest in grammar."]
+],
+"Opinion & Academic":[
+["play a crucial role in","Vocabulary plays a crucial role in fluency."],
+["strike a balance between","Teachers must strike a balance between accuracy and fluency."],
+["draw a distinction between","It is important to draw a distinction between errors and mistakes."],
+["shed light on","The study sheds light on why students avoid speaking."],
+["take into account","The curriculum should take different abilities into account."],
+["bear in mind","Bear in mind that the exam is timed."],
+["pose a challenge","Large classes pose a challenge for speaking practice."],
+["raise awareness of","The campaign raised awareness of online safety."],
+["mitigate the impact of","Practice tests can mitigate the impact of exam anxiety."],
+["come to the conclusion that","I came to the conclusion that rote learning is not enough."],
+["a growing body of evidence","A growing body of evidence suggests that output matters."],
+["gain / lose momentum","The project gained momentum in March."]
+]};
+const patterns=[
+["discuss / mention / emphasize / stress + object","discuss the plan; emphasize the importance of speaking","discuss about; emphasize on"],
+["result in / result from","Poor sleep results in low focus.","result to"],
+["depend on / contribute to / consist of","It depends on the level.","depend of; consist from"],
+["comprise (without of)","The test comprises three sections.","comprises of"],
+["suggest / recommend","suggest doing; suggest that he do / should do","suggest him to do"],
+["explain / describe / say to someone","explain the rule to me","explain me the rule"],
+["look forward to / be used to / object to + -ing","look forward to meeting you","look forward to meet"],
+["prevent / stop / discourage sb from + -ing","prevent them from cheating","prevent them to cheat"],
+["allow / enable / encourage sb + to","allow students to use dictionaries","allow students use"],
+["let / make sb + base verb","let them choose; make them repeat","let them to choose"],
+["insist on / apologize for / blame sb for","insisted on paying; apologized for being late","insisted to pay"],
+["accuse sb of / congratulate sb on","accused him of cheating","accused him for"]
+];
+const complexItems=[
+["She rarely makes mistakes.","Rarely does she make mistakes.","inversion"],
+["I have never seen such a motivated class.","Never have I seen such a motivated class.","inversion"],
+["He forgot his book and lost his homework.","Not only did he forget his book, but he also lost his homework.","not only...but also"],
+["As soon as the bell rang, the students left.","No sooner had the bell rung than the students left.","no sooner"],
+["You should not leave the room under any circumstances.","Under no circumstances should you leave the room.","inversion"],
+["We understood the problem only after the results came out.","Only after the results came out did we understand the problem.","only after"],
+["Lack of practice causes the problem.","It is lack of practice that causes the problem.","cleft"],
+["Students need more speaking time.","What students need is more speaking time.","what-clause"],
+["I didn't study abroad, so I'm not fluent now.","If I had studied abroad, I would be fluent now.","mixed conditional"],
+["She isn't confident, so she didn't volunteer.","If she were confident, she would have volunteered.","mixed conditional"]
+];
+const writingPrompts=[
+["Opinion","Is homework still useful?","150–200 words"],
+["Description","Describe a typical day in your classroom.","150–200 words"],
+["Semi-formal email","Write to a parent about a student who is falling behind.","150–200 words"],
+["Opinion","Should schools ban phones?","200 words"],
+["Discussion","Some people believe grammar should be taught explicitly; others prefer immersion. Discuss both views and give your opinion.","250 words"],
+["Reflection","Write a reflective paragraph on a lesson that did not go as planned.","150 words"],
+["Formal email","Write a formal email to a principal proposing a speaking club.","180 words"],
+["Opinion","Should English teachers correct every speaking error? Explain your position.","200 words"],
+["Discussion","Some learners improve through repetition, while others learn better through meaningful communication. Discuss both approaches.","250 words"],
+["Problem–solution","Many students understand English but hesitate to speak. What causes this gap and how can teachers address it?","220 words"],
+["Argumentative","Should schools reduce the amount of homework students receive?","220 words"],
+["Reflection","Describe a teaching mistake that taught you something valuable.","180 words"],
+["Semi-formal email","Write to a colleague suggesting a change to an English class routine.","180 words"],
+["Compare & contrast","Compare learning English through school lessons with learning through independent practice.","220 words"],
+["Opinion","Is fluency more important than grammatical accuracy for everyday communication?","200 words"],
+["Problem–solution","Students often rely too heavily on translation. Suggest practical ways to reduce this dependence.","220 words"],
+["Discussion","Some people believe advanced vocabulary is the key to sounding fluent. Others believe chunks and sentence patterns matter more. Discuss both views.","250 words"],
+["Professional reflection","What kind of English teacher do you want to become over the next three years?","200 words"]
+];
+
+let state=JSON.parse(localStorage.getItem("activeEnglishLab")||"{}");
+state.days=state.days||Array(7).fill(false); state.errors=state.errors||[]; state.checks=state.checks||{};
+let diagDay=0, chunkIndex=0, patternIndex=0, complexIndex=0, timerId=null, remaining=240;
+state.topicHistory=state.topicHistory||{};
+["diagnosis","speaking","writing","chunks","patterns","hedges","complex"].forEach(k=>state.topicHistory[k]=state.topicHistory[k]||[]);
+
+function save(){localStorage.setItem("activeEnglishLab",JSON.stringify(state)); updateOverall();}
+function show(id){
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.section===id));
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>show(b.dataset.section));
+
+function updateOverall(){
+ const total=7+3+12+12+8+7;
+ const done=state.days.filter(Boolean).length+Object.values(state.checks).filter(Boolean).length+state.errors.length;
+ const pct=Math.min(100,Math.round(done/total*100));
+ document.getElementById("overall").textContent=pct+"%"; document.getElementById("overallBar").style.width=pct+"%";
+}
+
+function rememberTopic(type,text){
+ if(!text)return;
+ state.topicHistory[type]=state.topicHistory[type]||[];
+ if(!state.topicHistory[type].includes(text))state.topicHistory[type].push(text);
+ save();
+}
+function previousTopic(type,current){
+ const a=state.topicHistory[type]||[];
+ if(a.length<2)return current;
+ return a[a.length-2];
+}
+function newDiagTopic(){
+ let i=Math.floor(Math.random()*promptBank.length), cur=document.getElementById("diagPrompt").textContent;
+ while(promptBank[i]===cur && promptBank.length>1)i=Math.floor(Math.random()*promptBank.length);
+ document.getElementById("diagPrompt").textContent=promptBank[i];
+ document.getElementById("diagTopicInfo").textContent="New topic";
+ rememberTopic("diagnosis",promptBank[i]);
+}
+function usePreviousDiagTopic(){
+ const p=previousTopic("diagnosis",document.getElementById("diagPrompt").textContent);
+ document.getElementById("diagPrompt").textContent=p;
+ document.getElementById("diagTopicInfo").textContent="Previous";
+}
+function newSpeakingTopic(){
+ let i=Math.floor(Math.random()*promptBank.length), cur=document.getElementById("speakPrompt").textContent;
+ while(promptBank[i]===cur && promptBank.length>1)i=Math.floor(Math.random()*promptBank.length);
+ document.getElementById("speakPrompt").textContent=promptBank[i];
+ document.getElementById("speakTopicInfo").textContent="New topic";
+ rememberTopic("speaking",promptBank[i]);
+}
+function usePreviousSpeakingTopic(){
+ const p=previousTopic("speaking",document.getElementById("speakPrompt").textContent);
+ document.getElementById("speakPrompt").textContent=p;
+ document.getElementById("speakTopicInfo").textContent="Previous";
+}
+function newWritingTopic(){
+ const s=document.getElementById("writePrompt");
+ let i=Math.floor(Math.random()*writingPrompts.length);
+ if(writingPrompts.length>1 && i===+s.value)i=(i+1)%writingPrompts.length;
+ s.value=i;loadWritingPrompt();
+}
+function usePreviousWritingTopic(){
+ const p=previousTopic("writing",document.getElementById("writeQuestion").textContent);
+ const i=writingPrompts.findIndex(x=>x[1]===p);
+ if(i>=0){document.getElementById("writePrompt").value=i;loadWritingPrompt();}
+}
+function usePreviousChunk(){
+ const p=previousTopic("chunks",document.getElementById("chunkText").textContent);
+ const cat=document.getElementById("chunkCategory").value;
+ const i=chunks[cat].findIndex(x=>x[0]===p);
+ if(i>=0){chunkIndex=i;renderChunk();document.getElementById("chunkTopicInfo").textContent="Previous";}
+}
+function renderTopicHistory(){
+ const box=document.getElementById("topicHistoryRows"); if(!box)return;
+ const labels={diagnosis:"Diagnosis",speaking:"Speaking",writing:"Writing",chunks:"Chunks",patterns:"Verb Patterns",hedges:"Linking & Hedging",complex:"Complex Structures"};
+ box.innerHTML=Object.entries(labels).map(([k,label])=>{
+  const a=state.topicHistory[k]||[];
+  return `<div class="card" style="margin-top:10px"><div class="actions" style="justify-content:space-between"><b>${label}</b><span class="badge">${a.length} used</span></div><div style="margin-top:8px">${a.length?a.slice().reverse().map(x=>`<span class="chip">${esc(x)}</span>`).join(""):'<span class="muted">No topics used yet.</span>'}</div></div>`;
+ }).join("");
+}
+function showUnusedTopics(){
+ const banks={
+  diagnosis:promptBank,
+  speaking:promptBank,
+  writing:writingPrompts.map(x=>x[1]),
+  chunks:Object.values(chunks).flat().map(x=>x[0]),
+  patterns:patterns.map(x=>x[0]),
+  complex:complexItems.map(x=>x[0])
+ };
+ const box=document.getElementById("topicHistoryRows");
+ box.innerHTML=Object.entries(banks).map(([k,a])=>{
+  const unused=a.filter(x=>!(state.topicHistory[k]||[]).includes(x));
+  return `<div class="card" style="margin-top:10px"><b>${esc(k)}</b><p>${unused.length?unused.map(x=>`<span class="chip">${esc(x)}</span>`).join(""):'<span class="muted">No unused topics in the current bank.</span>'}</p></div>`;
+ }).join("");
+}
+function clearTopicHistory(){
+ if(confirm("Clear topic history only? Your drafts and Error Log will stay.")){
+  Object.keys(state.topicHistory).forEach(k=>state.topicHistory[k]=[]);
+  save();renderTopicHistory();
+ }
+}
+function renderDays(){
+ document.getElementById("days").innerHTML=state.days.map((d,i)=>`<div class="day ${d?'done':''}"><b>Day ${i+1}</b><div class="smalltext">${d?'✓ Complete':'Not done'}</div></div>`).join("");
+ document.getElementById("diagPrompt").textContent=promptBank[diagDay%promptBank.length];document.getElementById("diagTopicInfo").textContent="Topic "+(diagDay+1);rememberTopic("diagnosis",document.getElementById("diagPrompt").textContent);
+ updateDayButton();
+}
+function toggleDay(){
+ state.days[diagDay]=!state.days[diagDay];
+ save(); renderDays();
+ const msg=state.days[diagDay]
+   ? '<div class="success" style="margin-top:10px">Day marked complete. You can cancel it anytime if you marked it by mistake.</div>'
+   : '<div class="note" style="margin-top:10px">Day marked incomplete again.</div>';
+ document.getElementById("diagMsg").innerHTML=msg;
+ updateDayButton();
+}
+function updateDayButton(){
+ const b=document.getElementById("dayToggleBtn");
+ if(!b) return;
+ b.textContent=state.days[diagDay] ? "↶ Cancel completion" : "✓ Mark today's speaking task complete";
+ b.className=state.days[diagDay] ? "btn secondary" : "btn";
+}
+function nextDiag(){diagDay=(diagDay+1)%7;renderDays()}
+function saveDiagnosis(){
+ const s=document.getElementById("diagSentence").value.trim();
+ if(!s){document.getElementById("diagMsg").innerHTML='<div class="error" style="margin-top:10px">Write one sentence first.</div>';return}
+ state.errors.push({wrong:s,right:"(review later)",cat:"FLU — Fluency",newSentence:""});
+ save();renderErrors();document.getElementById("diagMsg").innerHTML='<div class="success" style="margin-top:10px">Added to your personal error log.</div>';
+}
+function saveCheck(k,v){state.checks[k]=v;save()}
+
+function renderChunk(){
+ const cat=document.getElementById("chunkCategory").value; const item=chunks[cat][chunkIndex%chunks[cat].length];
+ document.getElementById("chunkText").textContent=item[0];document.getElementById("chunkExample").textContent=item[1];document.getElementById("chunkTopicInfo").textContent="Chunk "+((chunkIndex%chunks[cat].length)+1);
+}
+function shuffleChunk(){chunkIndex++;renderChunk();rememberTopic("chunks",document.getElementById("chunkText").textContent);document.getElementById("chunkOwn").value="";document.getElementById("chunkMsg").innerHTML=""}
+function revealChunk(){document.getElementById("chunkExample").classList.remove("hidden")}
+function checkChunk(){
+ const val=document.getElementById("chunkOwn").value.trim();
+ if(!val){document.getElementById("chunkMsg").innerHTML='<div class="error" style="margin-top:10px">Make your own sentence first.</div>';return}
+ state.checks["chunk"+Date.now()]=true;save();document.getElementById("chunkMsg").innerHTML='<div class="success" style="margin-top:10px">Great. Say it aloud once, then use the chunk again later today.</div>';
+}
+
+function renderPatterns(){
+ document.getElementById("patternTable").innerHTML=patterns.map(p=>`<tr><td><b>${p[0]}</b></td><td>${p[1]}</td><td><span class="chip">${p[2]}</span></td></tr>`).join("");
+}
+const patternQuestions=[
+["Which is correct?","We discussed the new curriculum.","We discussed about the new curriculum."],
+["Which is correct?","I look forward to meeting you.","I look forward to meet you."],
+["Which is correct?","She explained the rule to me.","She explained me the rule."],
+["Which is correct?","The school prevented them from using phones.","The school prevented them to use phones."],
+["Which is correct?","He insisted on paying.","He insisted to pay."]
+];
+function newPatternQuestion(){
+ const q=patternQuestions[Math.floor(Math.random()*patternQuestions.length)];
+ document.getElementById("patternQuiz").innerHTML=`<p><b>${q[0]}</b></p><button class="btn secondary" onclick="this.parentElement.innerHTML='<p class=success><b>Correct:</b> ${q[1]}</p>'">${q[1]}</button> <button class="btn secondary" onclick="this.parentElement.innerHTML='<p class=error>Try again. ${q[2]}</p>'">${q[2]}</button>`;
+}
+
+function checkHedge(){
+ const v=document.getElementById("hedgeInput").value.trim();
+ const good=/tend to|may|might|could|generally|typically|arguably|appears? to|seems? to|likely|some contexts/i.test(v);
+ document.getElementById("hedgeMsg").innerHTML=good?'<div class="success" style="margin-top:10px">Good: your claim is more cautious.</div>':'<div class="note" style="margin-top:10px">Try adding a hedge such as <b>tend to, may, might, could, generally, appears to</b>.</div>';
+}
+document.getElementById("hedges").innerHTML=["tend to","appear to","seem to","suggest that","indicate that","may / might / could","generally / typically / arguably","to some extent","it could be argued that","there is evidence to suggest that"].map(x=>`<span class="chip">${x}</span>`).join("");
+
+function newComplex(){complexIndex=(complexIndex+1)%complexItems.length;document.getElementById("complexQ").innerHTML=`Rewrite: <b>${complexItems[complexIndex][0]}</b><br><span class="smalltext">Use: ${complexItems[complexIndex][2]}</span>`;document.getElementById("complexA").value="";document.getElementById("complexMsg").innerHTML=""}
+function checkComplex(){
+ const ans=document.getElementById("complexA").value.trim().toLowerCase().replace(/[.,!?]/g,"");
+ const target=complexItems[complexIndex][1].toLowerCase().replace(/[.,!?]/g,"");
+ const close=ans.includes(target.slice(0,Math.max(12,Math.floor(target.length*.55))));
+ document.getElementById("complexMsg").innerHTML=close?`<div class="success" style="margin-top:10px">Looks good. Model: <b>${complexItems[complexIndex][1]}</b></div>`:`<div class="note" style="margin-top:10px">Model answer: <b>${complexItems[complexIndex][1]}</b></div>`;
+}
+function renderSpeaking(){const t=promptBank[Math.floor(Math.random()*promptBank.length)];document.getElementById("speakPrompt").textContent=t;rememberTopic("speaking",t);}
+function formatTime(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+let timerBase=240;
+function startTimer(sec){
+ clearInterval(timerId);
+ timerBase=sec;
+ remaining=sec;
+ document.getElementById("timer").textContent=formatTime(remaining);
+ runTimer();
+}
+function runTimer(){
+ if(remaining<=0)return;
+ clearInterval(timerId);
+ timerId=setInterval(()=>{
+   remaining--;
+   document.getElementById("timer").textContent=formatTime(remaining);
+   if(remaining<=0){clearInterval(timerId);timerId=null;}
+ },1000);
+}
+function pauseTimer(){clearInterval(timerId);timerId=null}
+function continueTimer(){if(remaining>0 && !timerId)runTimer()}
+function resetTimer(){
+ clearInterval(timerId);timerId=null;
+ remaining=timerBase;
+ document.getElementById("timer").textContent=formatTime(remaining);
+}
+function stopTimer(){pauseTimer()}
+function saveAccuracy(){const v=document.getElementById("accuracyNotes").value.trim();if(!v)return;state.errors.push({wrong:v,right:"Review from recording",cat:"FLU — Fluency",newSentence:""});save();renderErrors();document.getElementById("accuracyMsg").innerHTML='<div class="success" style="margin-top:10px">Added to your error log.</div>'}
+
+
+let mediaRecorder=null, recordedChunks=[], recordingStream=null;
+let speechRecognition=null, speechSupported=false;
+let diagRecording=false, speakingRecording=false;
+
+function getSpeechRecognition(){
+  const SR=window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) return null;
+  const r=new SR();
+  r.lang="en-US";
+  r.continuous=true;
+  r.interimResults=true;
+  return r;
+}
+function setupSpeechRecognition(targetId,statusId){
+  const r=getSpeechRecognition();
+  if(!r){
+    document.getElementById(statusId).textContent="Live speech-to-text is not supported in this browser. You can still type/edit the transcript manually.";
+    return null;
+  }
+  speechSupported=true;
+  r.onresult=e=>{
+    let finalText="", interimText="";
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const text=e.results[i][0].transcript;
+      if(e.results[i].isFinal) finalText+=text+" ";
+      else interimText+=text;
+    }
+    const box=document.getElementById(targetId);
+    const base=box.dataset.finalText || "";
+    if(finalText) box.dataset.finalText=base+finalText;
+    box.value=(box.dataset.finalText||"")+interimText;
+  };
+  r.onerror=e=>{
+    if(e.error!=="no-speech" && e.error!=="aborted"){
+      document.getElementById(statusId).textContent="Speech-to-text notice: "+e.error+". Recording can continue.";
+    }
+  };
+  r.onend=()=>{
+    if(diagRecording||speakingRecording){
+      try{r.start();}catch(_){}
+    }
+  };
+  return r;
+}
+function startSpeech(targetId,statusId){
+  speechRecognition=setupSpeechRecognition(targetId,statusId);
+  if(!speechRecognition)return;
+  try{speechRecognition.start();}catch(_){}
+}
+function stopSpeech(){
+  if(speechRecognition){
+    try{speechRecognition.onend=null;speechRecognition.stop();}catch(_){}
+  }
+  speechRecognition=null;
+}
+
+async function startMediaRecording(statusId,audioId,recordBtnId,stopBtnId,transcriptId,mode){
+  try{
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || window.isSecureContext!==true){
+      throw new Error("Microphone recording requires HTTPS or localhost.");
+    }
+    recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});
+    recordedChunks=[];
+    const mimeCandidates=["audio/webm;codecs=opus","audio/webm","audio/mp4"];
+    const mime=mimeCandidates.find(x=>window.MediaRecorder && MediaRecorder.isTypeSupported(x)) || "";
+    mediaRecorder=new MediaRecorder(recordingStream,mime?{mimeType:mime}:{});
+    mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size>0)recordedChunks.push(e.data)};
+    mediaRecorder.onstop=()=>{
+      const blob=new Blob(recordedChunks,{type:mediaRecorder.mimeType||"audio/webm"});
+      const url=URL.createObjectURL(blob);
+      const audio=document.getElementById(audioId);
+      audio.src=url;audio.classList.remove("hidden");
+      document.getElementById(statusId).textContent="Recording saved. Listen back and review the transcript.";
+      if(recordingStream)recordingStream.getTracks().forEach(t=>t.stop());
+      recordingStream=null;
+    };
+    mediaRecorder.start();
+    if(mode==="diag")diagRecording=true;else speakingRecording=true;
+    startSpeech(transcriptId,statusId);
+    document.getElementById(recordBtnId).disabled=true;
+    document.getElementById(stopBtnId).disabled=false;
+    document.getElementById(recordBtnId).textContent="● Recording...";
+  }catch(err){
+    document.getElementById(statusId).innerHTML='<div class="error"><b>Microphone unavailable.</b> '+(err.message||"Please allow microphone access.")+'</div>';
+  }
+}
+function stopMediaRecording(recordBtnId,stopBtnId,mode){
+  if(mode==="diag")diagRecording=false;else speakingRecording=false;
+  stopSpeech();
+  if(mediaRecorder&&mediaRecorder.state!=="inactive")mediaRecorder.stop();
+  document.getElementById(recordBtnId).disabled=false;
+  document.getElementById(stopBtnId).disabled=true;
+  document.getElementById(recordBtnId).textContent="● Start Recording";
+}
+
+async function toggleRecording(){
+  if(mediaRecorder&&mediaRecorder.state==="recording"){stopRecording();return}
+  const b=document.getElementById("diagTranscript");b.dataset.finalText=b.value||"";
+  await startMediaRecording("recordStatus","recordingAudio","recordBtn","stopRecordBtn","diagTranscript","diag");
+}
+function stopRecording(){stopMediaRecording("recordBtn","stopRecordBtn","diag")}
+function deleteRecording(){
+  const audio=document.getElementById("recordingAudio");
+  if(audio.src){URL.revokeObjectURL(audio.src);audio.removeAttribute("src");audio.load();}
+  audio.classList.add("hidden");clearDiagnosisTranscript();
+  document.getElementById("recordStatus").textContent="Recording deleted. Ready to record again.";
+  if(recordingStream)recordingStream.getTracks().forEach(t=>t.stop());
+  recordingStream=null;
+  if(mediaRecorder&&mediaRecorder.state!=="inactive")mediaRecorder.stop();
+  mediaRecorder=null;recordedChunks=[];
+}
+function copyTranscriptToDiagnosis(){
+  const text=document.getElementById("diagTranscript").value.trim();
+  document.getElementById("diagSentence").value=text;
+  document.getElementById("diagMsg").innerHTML='<div class="success" style="margin-top:10px">Transcript copied to the sentence field. You can edit it before saving.</div>';
+}
+function clearDiagnosisTranscript(){
+  const b=document.getElementById("diagTranscript");b.value="";b.dataset.finalText="";
+}
+
+async function startSpeakingRecorder(){
+  const b=document.getElementById("speakTranscript");b.dataset.finalText=b.value||"";
+  await startMediaRecording("speakRecordStatus","speakRecordingAudio","speakRecordBtn","speakStopBtn","speakTranscript","speaking");
+}
+function stopSpeakingRecorder(){stopMediaRecording("speakRecordBtn","speakStopBtn","speaking")}
+function clearSpeakingTranscript(){
+  const b=document.getElementById("speakTranscript");b.value="";b.dataset.finalText="";
+  document.getElementById("speakSentence").value="";
+  document.getElementById("speakCorrection").value="";
+}
+function copySelectedTranscriptSentence(){
+  const box=document.getElementById("speakTranscript");
+  const selected=box.value.substring(box.selectionStart,box.selectionEnd).trim();
+  if(selected)document.getElementById("speakSentence").value=selected;
+  else document.getElementById("speakCorrectionMsg").innerHTML='<div class="note" style="margin-top:10px">Highlight one sentence in the transcript first.</div>';
+}
+function copyTranscriptToSentence(){
+  const text=document.getElementById("speakTranscript").value.trim();
+  if(text)document.getElementById("speakSentence").value=text;
+}
+function saveSpeakingCorrection(){
+  const wrong=document.getElementById("speakSentence").value.trim();
+  const right=document.getElementById("speakCorrection").value.trim();
+  const cat=document.getElementById("speakErrorCategory").value;
+  const nw=document.getElementById("speakNewSentence").value.trim();
+  if(!wrong||!right){
+    document.getElementById("speakCorrectionMsg").innerHTML='<div class="error" style="margin-top:10px">Add both the sentence you said and your corrected version.</div>';
+    return;
+  }
+  state.errors.push({wrong,right,cat,newSentence:nw});
+  save();renderErrors();
+  document.getElementById("speakCorrectionMsg").innerHTML='<div class="success" style="margin-top:10px">Saved to your Error Log.</div>';
+}
+
+
+function analyzeWriting(){
+  const text=document.getElementById("writingArea").value.trim();
+  const box=document.getElementById("writingAnalysis");
+  if(!text){box.innerHTML='<div class="error">Write something first.</div>';return;}
+  const findings=[];
+  const add=(original,corrected,category,why,suggestion)=>findings.push({original,corrected,category,why,suggestion});
+  const rules=[
+    [/there\s+so\s+many\s+things\s+to\s+learn/i,"there are so many things to learn","Grammar — subject/verb agreement","With plural 'things', use 'there are'.","There are many things students need to learn."],
+    [/in\s+1\s+subject/i,"in a single subject","Word choice / naturalness","'A single subject' is more natural in formal writing.","There is a lot to learn within a single subject."],
+    [/school\s+student\s+and\s+teacher\s+don['’]?t\s+have/i,"students and teachers do not have","Noun form","Use plural nouns when referring to people generally.","Students and teachers do not always have enough time to..."],
+    [/make\s+sure\s+all\s+student\s+understand/i,"make sure all students understand","Grammar — plural noun","'Students' is plural because the sentence refers to all students.","...make sure all students understand the material."],
+    [/homework\s+make\s+students\s+to\s+do/i,"homework makes students do","Grammar — verb pattern","'Homework' is singular, so use 'makes'. After 'make + object', use the base verb without 'to'.","Homework gives students more opportunities to practise what they have learned."],
+    [/practice\s+about\s+the\s+subject/i,"practise the subject / practise what they have learned","Verb pattern / collocation","'Practise' normally takes the object directly; 'practice about' is not natural here.","...practise what they learned in class."],
+    [/that\s+they\s+learn\s+before\s+in\s+the\s+school/i,"what they learned at school","Naturalness / relative clause","'What they learned at school' is more concise and natural.","...practise what they learned at school."],
+    [/in\s+the\s+school/i,"at school","Article / collocation","When referring to school as the regular place of study, 'at school' is usually more natural.","...what they learned at school."]
+  ];
+  rules.forEach(r=>{const m=text.match(r[0]);if(m)add(m[0],r[1],r[2],r[3],r[4]);});
+  const lower=text.toLowerCase();
+  const count=w=>(lower.match(new RegExp("\\b"+w+"\\b","g"))||[]).length;
+  if(count("and")>=3)add("Repeated 'and'","Vary the sentence structure.","Cohesion / style","Repeated 'and' can make formal writing feel list-like.","Use linking only when the relationship is clear: in addition, while, whereas, moreover, etc.");
+  if(count("so")>=2)add("Repeated 'so'","Use more precise result linking.","Cohesion / style","'So' is correct, but repeated use can sound less controlled in formal writing.","Try therefore, consequently, or as a result when appropriate.");
+  if(/\bi think\s+yes\b/i.test(text))add("I think yes","Homework can still play a useful role in learning.","Register / argument","A direct claim gives an opinion paragraph a stronger academic opening.","For example: 'Homework can still play a useful role, particularly when it reinforces classroom learning.'");
+  [["very","crucial / highly / particularly (context-dependent)"],["thing","factor / aspect / issue / element"],["make","create / enable / help / lead to / result in"],["good","effective / beneficial / valuable / useful"],["bad","harmful / ineffective / problematic"]].forEach(([w,alts])=>{const n=count(w);if(n)add(`'${w}' (${n}×)`,"Choose a more precise word.","Word choice — "+w,"The word is not automatically wrong, but precision makes your writing stronger.","Possible alternatives: "+alts+"." );});
+  window.lastWritingFindings=findings;
+  if(!findings.length){box.innerHTML='<div class="success"><b>No obvious pattern-based errors detected.</b><br>This is not a full AI grammar score; it means this guided checker did not find a rule it can confidently flag.</div>';return;}
+  box.innerHTML=`<div class="success"><b>${findings.length} patterns found.</b> Review them one by one. You do not need to fix everything at once.</div>`+
+    findings.map((f,i)=>`<div class="card" style="margin-top:10px;border-left:4px solid var(--blue)">
+      <div class="actions" style="justify-content:space-between"><b>#${i+1} ${esc(f.category)}</b><button class="btn small secondary" onclick="sendWritingErrorToLog(${i})">Add to Error Log</button></div>
+      <p><b>What you wrote</b><br><span class="error" style="display:inline-block;margin-top:5px">${esc(f.original)}</span></p>
+      <p><b>Correct version</b><br><span class="success" style="display:inline-block;margin-top:5px">${esc(f.corrected)}</span></p>
+      <p><b>Why?</b><br>${esc(f.why)}</p>
+      <p><b>Better / more natural suggestion</b><br><span class="note" style="display:inline-block;margin-top:5px">${esc(f.suggestion)}</span></p>
+    </div>`).join("");
+}
+function sendWritingErrorToLog(i){
+  const f=window.lastWritingFindings?.[i];if(!f)return;
+  state.errors.push({wrong:f.original,right:f.corrected,cat:f.category,newSentence:f.suggestion});
+  save();renderErrors();
+  const cards=document.querySelectorAll("#writingAnalysis > .card");
+  if(cards[i]){const b=cards[i].querySelector("button");if(b){b.textContent="✓ Added";b.disabled=true;}}
+}
+function initWriting(){
+ const sel=document.getElementById("writePrompt");sel.innerHTML=writingPrompts.map((p,i)=>`<option value="${i}">${p[0]} — ${p[1]}</option>`).join("");loadWritingPrompt();
+ document.getElementById("writingArea").addEventListener("input",()=>{const n=document.getElementById("writingArea").value.trim().split(/\s+/).filter(Boolean).length;document.getElementById("wordcount").textContent=n+" words"});
+}
+function loadWritingPrompt(){const p=writingPrompts[+document.getElementById("writePrompt").value||0];document.getElementById("writeQuestion").textContent=p[1];document.getElementById("writeTarget").textContent=p[2];rememberTopic("writing",p[1]);}
+function saveDraft(){state.draft=document.getElementById("writingArea").value;save();document.getElementById("revision").innerHTML='<div class="success" style="margin-top:10px">Draft saved in this browser.</div>'}
+function runRevisionChecklist(){
+ const t=document.getElementById("writingArea").value;const n=t.trim().split(/\s+/).filter(Boolean).length;
+ document.getElementById("revision").innerHTML=`<div class="card" style="margin-top:12px;background:#f8fbff"><b>Revision pass</b><ul><li>Word count: <b>${n}</b></li><li>Search for repeated <b>and / but / so</b>.</li><li>Find 5 generic words and replace them with precise chunks.</li><li>Look for absolute claims and consider hedging.</li><li>Add only the most important errors to your Error Log.</li></ul></div>`;
+}
+
+function addError(){
+ const wrong=document.getElementById("eWrong").value.trim(), right=document.getElementById("eRight").value.trim(), cat=document.getElementById("eCat").value, nw=document.getElementById("eNew").value.trim();
+ if(!wrong||!right)return;
+ state.errors.push({wrong,right,cat,newSentence:nw});save();renderErrors();
+ ["eWrong","eRight","eNew"].forEach(id=>document.getElementById(id).value="");
+}
+function renderErrors(){
+ document.getElementById("errorRows").innerHTML=state.errors.length?state.errors.map(e=>`<tr><td>${esc(e.wrong)}</td><td>${esc(e.right)}</td><td>${esc(e.cat)}</td><td>${esc(e.newSentence||"—")}</td></tr>`).join(""):'<tr><td colspan="4" class="muted">No errors logged yet. That is okay—the log is supposed to grow from real output.</td></tr>';
+}
+function clearErrors(){if(confirm("Clear your error log?")){state.errors=[];save();renderErrors()}}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+renderDays();renderChunk();renderPatterns();newPatternQuestion();newComplex();renderSpeaking();initWriting();renderErrors();renderTopicHistory();
+if(state.draft){document.getElementById("writingArea").value=state.draft;document.getElementById("wordcount").textContent=state.draft.trim().split(/\s+/).filter(Boolean).length+" words"}
+updateOverall();
+</script>
+</body>
+</html>
